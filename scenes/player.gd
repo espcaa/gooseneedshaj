@@ -45,12 +45,10 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
-
-
-
-
 func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 	if anim_name == "fadein":
 		position.x = checkpoint_pos_x
 		position.y = checkpoint_pos_y
-		$AnimationPlayer.play_backwards("fadeout")
+		# wait for 0.1s
+		await get_tree().create_timer(0.3).timeout
+		$AnimationPlayer.play("fadeout")

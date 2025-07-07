@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=4 uid="uid://flks3x25i8hs"]
+[gd_scene load_steps=6 format=4 uid="uid://flks3x25i8hs"]
 
 [ext_resource type="TileSet" uid="uid://c8ddo0cpuriya" path="res://assets/tileset.tres" id="1_014kd"]
 [ext_resource type="Script" uid="uid://d22bkkgpb3h80" path="res://scenes/level_1.gd" id="1_rus8k"]
 [ext_resource type="PackedScene" uid="uid://crwcibb68t4bx" path="res://scenes/player.tscn" id="2_bswci"]
+[ext_resource type="Texture2D" uid="uid://c7ou0pqik3hmk" path="res://assets/arrow.png" id="4_5xbjy"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5xbjy"]
 size = Vector2(1968.5, 211)
@@ -28,7 +29,7 @@ tile_set = ExtResource("1_014kd")
 [node name="TileMapLayer2" type="TileMapLayer" parent="."]
 texture_filter = 1
 scale = Vector2(2, 2)
-tile_map_data = PackedByteArray("AAAHAP//AgAGAAMAAAAMAP//AgADAAMAAAANAP//AgAEAAMAAAAOAP//AgAFAAMAAAAMAAAAAgADAAUAAAANAAAAAgAEAAUAAAAOAAAAAgAFAAUAAAANAP7/AgAAAAMAAAA=")
+tile_map_data = PackedByteArray("AAAMAP//AgADAAMAAAANAP//AgAEAAMAAAAOAP//AgAFAAMAAAAMAAAAAgADAAUAAAANAAAAAgAEAAUAAAAOAAAAAgAFAAUAAAANAP7/AgAAAAMAAAA=")
 tile_set = ExtResource("1_014kd")
 
 [node name="Area2D" type="Area2D" parent="."]
@@ -36,5 +37,11 @@ tile_set = ExtResource("1_014kd")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 position = Vector2(65.75, 610.5)
 shape = SubResource("RectangleShape2D_5xbjy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(382, -129)
+scale = Vector2(2, 2)
+texture = ExtResource("4_5xbjy")
 
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
