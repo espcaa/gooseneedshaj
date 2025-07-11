@@ -1,0 +1,229 @@
+[gd_scene load_steps=20 format=4 uid="uid://byehu8svd5xyf"]
+
+[ext_resource type="TileSet" uid="uid://c8ddo0cpuriya" path="res://assets/tileset.tres" id="1_f0ip2"]
+[ext_resource type="Script" uid="uid://cvhsjhbsamhd0" path="res://scenes/level_3.gd" id="1_jyq2n"]
+[ext_resource type="Material" uid="uid://ccryjquh8cumq" path="res://scenes/pixelshader.tres" id="1_yesqi"]
+[ext_resource type="PackedScene" uid="uid://crwcibb68t4bx" path="res://scenes/player.tscn" id="3_qyetb"]
+[ext_resource type="Shader" uid="uid://c7a7ccxqv3l01" path="res://scenes/pixel.gdshader" id="3_rupth"]
+[ext_resource type="Script" uid="uid://btw0ykj7kut4a" path="res://scenes/tilemap.gd" id="5_6qt4k"]
+[ext_resource type="PackedScene" uid="uid://b5ettrwfqql3i" path="res://scenes/worldborder.tscn" id="5_7uttt"]
+[ext_resource type="PackedScene" uid="uid://d3y824mc23lwg" path="res://scenes/checkpoint.tscn" id="6_6lxtr"]
+
+[sub_resource type="Shader" id="Shader_hlge4"]
+code = "shader_type canvas_item;
+render_mode unshaded;
+
+uniform float dissolve_amount : hint_range(0.0, 1.0) = 0.0;
+uniform vec4 modulate : source_color = vec4(1.0);
+
+// 4x4 Bayer matrix encoded as a 1D array
+int bayer4(vec2 uv) {
+	int x = int(mod(uv.x, 4.0));
+	int y = int(mod(uv.y, 4.0));
+	int index = y * 4 + x;
+	int thresholds[16] = int[16](
+		0,  8,  2, 10,
+		12, 4, 14, 6,
+		3, 11, 1, 9,
+		15, 7, 13, 5
+	);
+	return thresholds[index];
+}
+
+void fragment() {
+	// Snap UVs to nearest texel
+	vec2 pixel_uv = floor(UV / TEXTURE_PIXEL_SIZE);
+	vec4 tex_color = texture(TEXTURE, (pixel_uv + 0.5) * TEXTURE_PIXEL_SIZE);
+
+	if (tex_color.a < 0.1) {
+		discard;
+	}
+
+	// Convert dissolve amount to a 0–15 integer
+	int dissolve_threshold = int(dissolve_amount * 16.0);
+
+	// Check against Bayer value at this pixel
+	if (bayer4(pixel_uv) < dissolve_threshold) {
+		discard;
+	}
+
+	COLOR = tex_color * modulate;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_5mhml"]
+shader = SubResource("Shader_hlge4")
+shader_parameter/dissolve_amount = 0.0
+shader_parameter/modulate = Color(1, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_8flnf"]
+resource_name = "hide"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.233333),
+"transitions": PackedFloat32Array(1, -2),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_vskon"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_hebyl"]
+resource_name = "show"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.266667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hebyl"]
+_data = {
+&"RESET": SubResource("Animation_vskon"),
+&"hide": SubResource("Animation_8flnf"),
+&"show": SubResource("Animation_hebyl")
+}
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rupth"]
+shader = ExtResource("3_rupth")
+shader_parameter/dissolve_amount = 1.0
+shader_parameter/modulate = Color(1, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_ydvue"]
+resource_name = "hide"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.233333),
+"transitions": PackedFloat32Array(-2, -2),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_qe84c"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+
+[sub_resource type="Animation" id="Animation_02wpa"]
+resource_name = "show"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.266667),
+"transitions": PackedFloat32Array(-2, -2),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_02wpa"]
+_data = {
+&"RESET": SubResource("Animation_qe84c"),
+&"hide": SubResource("Animation_ydvue"),
+&"show": SubResource("Animation_02wpa")
+}
+
+[node name="level" type="Node2D"]
+script = ExtResource("1_jyq2n")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -3975.0
+offset_top = -3035.0
+offset_right = 6726.0
+offset_bottom = 7075.0
+color = Color(0, 0, 0, 1)
+
+[node name="RED" type="TileMapLayer" parent="."]
+texture_filter = 2
+material = SubResource("ShaderMaterial_5mhml")
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AAD+/wAAAgADAAAAAAD//wAAAgAEAAAAAAAAAAAAAgAFAAAAAAD+/wEAAgADAAIAAAD//wEAAgAEAAIAAAAAAAEAAgAFAAIAAAD+//7/AgAHAAAAAAD+////AgAHAAEAAAAAAP7/AgAAAAYAAAAAAP//AgAAAAcAAAAeABEAAgADAAAAAAAeABIAAgADAAIAAAAfABEAAgAEAAAAAAAfABIAAgAEAAIAAAAgABEAAgAFAAAAAAAgABIAAgAFAAIAAAAjABAAAgAAAAUAAAAjABEAAgADAAAAAAAjABIAAgADAAIAAAAkABAAAgABAAUAAAAkABEAAgAEAAAAAAAkABIAAgAEAAIAAAAlAA8AAgAAAAYAAAAlABAAAgAAAAcAAAAlABEAAgAEAAAAAAAlABIAAgAEAAIAAAAmABEAAgAFAAAAAAAmABIAAgAFAAIAAAAPAAYAAgADAAAAAAAPAAcAAgADAAIAAAAPAAQAAgAHAAIAAAAPAAUAAgAHAAMAAAAQAAYAAgAFAAAAAAAQAAcAAgAFAAIAAAAmAA8AAgADAAkAAAAfAA8AAgAEAAkAAAApABEAAgADAAAAAAAqABEAAgAFAAAAAAApABIAAgADAAIAAAAqABIAAgAFAAIAAAAtABEAAgADAAAAAAAtABIAAgADAAIAAAAuABEAAgAFAAAAAAAuABIAAgAFAAIAAAAxABEAAgADAAAAAAAxABIAAgADAAIAAAAyABEAAgAEAAAAAAAyABIAAgAEAAIAAAAzABEAAgAEAAAAAAA0ABEAAgAEAAAAAAA1ABEAAgAEAAAAAAA2ABEAAgAFAAAAAAA2ABIAAgAFAAIAAAA1ABIAAgAEAAIAAAA0ABIAAgAEAAIAAAAzABIAAgAEAAIAAAAxAA8AAgADAAkAAAAyAA8AAgABAAYAAAAyABAAAgABAAcAAAAtABAAAgABAAQAAAAqABAAAgAGAAUAAAA=")
+tile_set = ExtResource("1_f0ip2")
+script = ExtResource("5_6qt4k")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="RED"]
+libraries = {
+&"": SubResource("AnimationLibrary_hebyl")
+}
+
+[node name="BLUE" type="TileMapLayer" parent="."]
+texture_filter = 2
+material = SubResource("ShaderMaterial_rupth")
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AAAHAAYAAgACAAAAAAAHAAcAAgACAAIAAAAGAAcAAgAAAAIAAAAGAAYAAgAAAAAAAAAVABAAAgAAAAIAAAAVAA8AAgAAAAAAAAAWAA8AAgACAAAAAAAWABAAAgACAAIAAAAWAA4AAgABAAQAAAA=")
+tile_set = ExtResource("1_f0ip2")
+collision_enabled = false
+script = ExtResource("5_6qt4k")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BLUE"]
+libraries = {
+&"": SubResource("AnimationLibrary_02wpa")
+}
+
+[node name="tilemap" type="TileMapLayer" parent="."]
+texture_filter = 2
+material = ExtResource("1_yesqi")
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AAAGAP7/AgAHAAQAAAAhABEAAgADAAMAAAAhABIAAgADAAUAAAAiABEAAgAFAAMAAAAiABIAAgAFAAUAAAAVAAMAAgAHAAQAAAA=")
+tile_set = ExtResource("1_f0ip2")
+
+[node name="player" parent="." instance=ExtResource("3_qyetb")]
+position = Vector2(-15, -18)
+
+[node name="worldborder" parent="." instance=ExtResource("5_7uttt")]
+position = Vector2(-31, 250)
+
+[node name="worldborder2" parent="." instance=ExtResource("5_7uttt")]
+position = Vector2(1480, 350)
+
+[node name="worldborder3" parent="." instance=ExtResource("5_7uttt")]
+position = Vector2(1480, 350)
+
+[node name="checkpoint" parent="." instance=ExtResource("6_6lxtr")]
+position = Vector2(1088, 512)

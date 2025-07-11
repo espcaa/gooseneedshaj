@@ -1,0 +1,71 @@
+[gd_scene load_steps=8 format=3 uid="uid://bmqvxao107dnl"]
+
+[ext_resource type="Material" uid="uid://ccryjquh8cumq" path="res://scenes/pixelshader.tres" id="1_8flnf"]
+[ext_resource type="TileSet" uid="uid://c8ddo0cpuriya" path="res://assets/tileset.tres" id="2_vskon"]
+[ext_resource type="Script" uid="uid://btw0ykj7kut4a" path="res://scenes/tilemap.gd" id="3_vskon"]
+
+[sub_resource type="Animation" id="Animation_8flnf"]
+resource_name = "hide"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.233333),
+"transitions": PackedFloat32Array(1, -2),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="Animation" id="Animation_vskon"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_hebyl"]
+resource_name = "show"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:material:shader_parameter/dissolve_amount")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.266667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_hebyl"]
+_data = {
+&"RESET": SubResource("Animation_vskon"),
+&"hide": SubResource("Animation_8flnf"),
+&"show": SubResource("Animation_hebyl")
+}
+
+[node name="RED" type="TileMapLayer"]
+texture_filter = 2
+material = ExtResource("1_8flnf")
+scale = Vector2(2, 2)
+tile_set = ExtResource("2_vskon")
+script = ExtResource("3_vskon")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_hebyl")
+}

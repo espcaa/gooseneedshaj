@@ -1,6 +1,5 @@
 extends Node2D
+@export var starting_color = "BLUE"
 
-
-func _on_area_2d_body_entered(body: Node2D) -> void:
-	if body.name == "player":
-		body.respawn()
+func player_respawned():
+	pass

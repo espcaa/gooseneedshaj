@@ -1,0 +1,39 @@
+shader_type canvas_item;
+render_mode unshaded;
+
+uniform float dissolve_amount : hint_range(0.0, 1.0) = 0.0;
+uniform vec4 modulate : source_color = vec4(1.0);
+
+// 4x4 Bayer matrix encoded as a 1D array
+int bayer4(vec2 uv) {
+	int x = int(mod(uv.x, 4.0));
+	int y = int(mod(uv.y, 4.0));
+	int index = y * 4 + x;
+	int thresholds[16] = int[16](
+		0,  8,  2, 10,
+		12, 4, 14, 6,
+		3, 11, 1, 9,
+		15, 7, 13, 5
+	);
+	return thresholds[index];
+}
+
+void fragment() {
+	// Snap UVs to nearest texel
+	vec2 pixel_uv = floor(UV / TEXTURE_PIXEL_SIZE);
+	vec4 tex_color = texture(TEXTURE, (pixel_uv + 0.5) * TEXTURE_PIXEL_SIZE);
+
+	if (tex_color.a < 0.1) {
+		discard;
+	}
+
+	// Convert dissolve amount to a 0–15 integer
+	int dissolve_threshold = int(dissolve_amount * 16.0);
+
+	// Check against Bayer value at this pixel
+	if (bayer4(pixel_uv) < dissolve_threshold) {
+		discard;
+	}
+
+	COLOR = tex_color * modulate;
+}

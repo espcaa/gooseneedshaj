@@ -1,9 +1,12 @@
-[gd_scene load_steps=11 format=3 uid="uid://crwcibb68t4bx"]
+[gd_scene load_steps=14 format=3 uid="uid://crwcibb68t4bx"]
 
 [ext_resource type="Script" uid="uid://cs6rjlr0b7oqs" path="res://scenes/player.gd" id="1_dqkch"]
 [ext_resource type="Texture2D" uid="uid://u2dm7lsueyr" path="res://assets/player2.png" id="1_qhqgy"]
 [ext_resource type="Texture2D" uid="uid://bgh0hsx7qgr2w" path="res://assets/player1.png" id="2_dqkch"]
+[ext_resource type="Material" uid="uid://ccryjquh8cumq" path="res://scenes/pixelshader.tres" id="2_qlg0r"]
 [ext_resource type="Texture2D" uid="uid://lphr4hxjb46x" path="res://assets/player4.png" id="3_qlg0r"]
+[ext_resource type="PackedScene" uid="uid://c0h7np7b1amv6" path="res://scenes/hud.tscn" id="6_tuyoq"]
+[ext_resource type="AudioStream" uid="uid://cfdr05g5al6ii" path="res://assets/foot.wav" id="7_fjrip"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_tuyoq"]
 radius = 13.0
@@ -100,7 +103,8 @@ script = ExtResource("1_dqkch")
 shape = SubResource("CapsuleShape2D_tuyoq")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-texture_filter = 1
+texture_filter = 2
+material = ExtResource("2_qlg0r")
 position = Vector2(-2, 0)
 scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_fjrip")
@@ -109,6 +113,12 @@ frame_progress = 0.439724
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, -70)
+position_smoothing_enabled = true
+rotation_smoothing_enabled = true
+drag_left_margin = 0.0
+drag_top_margin = 0.0
+drag_right_margin = 0.0
+drag_bottom_margin = 0.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -122,5 +132,11 @@ offset_right = 478.0
 offset_bottom = 210.0
 color = Color(0, 0, 0, 0)
 
+[node name="HUD" parent="." instance=ExtResource("6_tuyoq")]
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("7_fjrip")
+
 [connection signal="animation_changed" from="AnimationPlayer" to="." method="_on_animation_player_animation_changed"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="finished" from="AudioStreamPlayer2D" to="." method="_on_audio_stream_player_2d_finished"]
